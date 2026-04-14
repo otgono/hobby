@@ -1,0 +1,37 @@
+1. Definition (clean, no fluff):
+
+A protocol is a set of rules for how communication happens between client and server
+
+In your case
+
+Your protocol is:
+
+login <name>
+whoami
+ping
+say <message>
+
+That’s it.
+
+2.cmd.split(" ")[1] — what is this doing?
+Step-by-step
+
+Let’s say user types:
+        login otgonoo
+    Step 1: split by space
+        cmd.split(" ")
+    Result:
+        ["login", "otgonoo"]
+Step 2: [1]
+cmd.split(" ")[1]
+Means:
+give me the second item (index starts at 0)
+So:
+"name" = "otgonoo"
+
+3. cmd.slice(4)- means:
+“give me the string starting from index 4 to the end”
+
+4. socket.on("close", () => {
+  clients.delete(socket);
+}); mash chuhal

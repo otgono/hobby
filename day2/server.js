@@ -1,7 +1,10 @@
 const net = require("net");
-
+const clients = new Set();
 const server = net.createServer((socket) => {
   console.log("Client connected");
+  clients.add(socket);
+
+  socket.username = "guest";
 
   let buffer = "";
 
@@ -18,21 +21,35 @@ const server = net.createServer((socket) => {
     });
 
     function handleCommand(socket, cmd) {
-  console.log("Command:", cmd);
-
-  if (cmd === "ping") {
+    if (cmd.startsWith("login ")){
+      const name = cmd.split(" ")[1];
+      socket.username = name;
+      socket.write(`Welcome, ${name}!\n`);
+    }
+    else if (cmd === "whoami") {
+      socket.write(`You are ${socket.username}\n`);
+    }
+    else if (cmd === "ping") {
     socket.write("pong\n");
   }
-  else if (cmd === "hello"){
-    socket.write("lalraa\n");
-  } else {
+  else if (cmd.startsWith("say ")) {
+  const message = cmd.slice(4);
+
+  clients.forEach((client) => {
+    client.write(`${socket.username}: ${message}\n`);
+  });
+}
+      else {
     socket.write("unknown command\n");
   }
 }
 
   socket.on("end", () => {
-    console.log("Client disconnected");
+    console.log(`Client ${socket.username} disconnected`);
   });
+  socket.on("close", () => {
+  clients.delete(socket);
+});
 });
 
 server.listen(4000, () => {
