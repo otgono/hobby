@@ -34,4 +34,4 @@ So:
 
 4. socket.on("close", () => {
   clients.delete(socket);
-}); mash chuhal
+}); mash chuhal. basically means removing offline users

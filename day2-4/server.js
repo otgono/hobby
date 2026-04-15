@@ -1,28 +1,8 @@
 const net = require("net");
 const clients = new Set();
-const server = net.createServer((socket) => {
-  console.log("Client connected");
-  clients.add(socket);
-
-  socket.username = "guest";
-
-  let buffer = "";
-
-    socket.on("data", (chunk) => {
-    buffer += chunk.toString();
-
-    let lines = buffer.split("\n");
-
-    buffer = lines.pop(); // keep unfinished part
-
-    for (let line of lines) {
-        handleCommand(socket, line.trim());
-    }
-    });
-
-    function handleCommand(socket, cmd) {
+function handleCommand(socket, cmd) {
     if (cmd.startsWith("login ")){
-      const name = cmd.split(" ")[1];
+      const name = cmd.split(" ").slice(1, 3).join(" ");
       socket.username = name;
       socket.write(`Welcome, ${name}!\n`);
     }
@@ -39,10 +19,32 @@ const server = net.createServer((socket) => {
     client.write(`${socket.username}: ${message}\n`);
   });
 }
+else if (cmd === "quit" || cmd === "exit") {
+  socket.end(); // 👈 THIS is the key
+}
       else {
     socket.write("unknown command\n");
   }
 }
+ function handleData(socket, chunk, clients) {
+  socket.buffer += chunk.toString();
+
+  let lines = socket.buffer.split("\n");
+  socket.buffer = lines.pop();
+
+  for (let line of lines) {
+    handleCommand(socket, line.trim(), clients);
+  }
+}
+const server = net.createServer((socket) => {
+  console.log("Client connected");
+  clients.add(socket);
+
+  socket.username = "guest";
+  socket.buffer = "";
+  socket.on("data", (chunk) => {
+    handleData(socket, chunk, clients);
+  });
 
   socket.on("end", () => {
     console.log(`Client ${socket.username} disconnected`);
@@ -51,7 +53,6 @@ const server = net.createServer((socket) => {
   clients.delete(socket);
 });
 });
-
 server.listen(4000, () => {
   console.log("Server running on port 4000");
 });
