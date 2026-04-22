@@ -16,7 +16,7 @@ wss.on("connection", (ws) => {
   });
 
   ws.on("close", () => {
-    console.log("Client disconnected");
     users.removeUser(ws);
+    console.log("Client disconnected");
   });
 });
