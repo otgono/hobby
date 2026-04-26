@@ -1,6 +1,6 @@
 // commands.js
 const { joinRoom, broadcast } = require("./rooms");
-
+const db = require("./db");
 function handleCommand(ws, cmd, users) {
   const user = users.getUser(ws);
 
@@ -29,11 +29,16 @@ function handleCommand(ws, cmd, users) {
     const room = cmd.slice(5).trim();
     joinRoom(ws, room, users);
     ws.send(`Joined room: ${room}`);
+  
   }
 
   else if (cmd.startsWith("say ")) {
     const message = cmd.slice(4);
-    broadcast(ws, `${user.username}: ${message}`, users);
+    if (!message.trim()) {
+      ws.send("Empty message not allowed");
+      return;
+    }
+    broadcast(ws, message, users);
   }
   else if (cmd === "users") {
     const list = users.getUsersInRoom(user.room);
@@ -43,7 +48,10 @@ function handleCommand(ws, cmd, users) {
   const parts = cmd.split(" ");
   const targetName = parts[1];
   const message = parts.slice(2).join(" ");
-
+  if (!targetName || !message.trim()) {
+    ws.send("Invalid PM format");
+    return;
+  }
   const targetWs = users.getWsByUsername(targetName);
 
   if (!targetWs || targetWs.readyState !== 1) {

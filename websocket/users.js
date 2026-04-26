@@ -1,7 +1,6 @@
 // users.js
 const users = new Map(); // ws → { username, room }
 const nameToWs = new  Map(); // username → ws
-
 function addUser(ws) {
   users.set(ws, { username: null, room: null });
 }
