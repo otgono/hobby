@@ -1,6 +1,6 @@
 // commands.js
 const { joinRoom, broadcast } = require("./rooms");
-const db = require("./db");
+
 function handleCommand(ws, cmd, users) {
   const user = users.getUser(ws);
 
@@ -62,7 +62,7 @@ function handleCommand(ws, cmd, users) {
   targetWs.send(`(PM from ${user.username}): ${message}`);
 }
   else {
-    ws.send("unknown command");
+    broadcast(ws, cmd, users);
   }
 }
 

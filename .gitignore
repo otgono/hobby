@@ -37,3 +37,4 @@ build/
 # Optional: lock files (usually NOT ignored, but you can if you want)
 # package-lock.json
 # yarn.lock
+node_modules
